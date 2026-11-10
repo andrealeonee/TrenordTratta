@@ -140,13 +140,22 @@ public partial class DeparturesViewModel(
             logger.LogError(ex, "Refresh partenze fallito");
             ErrorMessage = ex is InvalidOperationException
                 ? ex.Message
-                : "Impossibile aggiornare le partenze. Controlla la connessione e riprova.";
+                : $"Impossibile aggiornare le partenze.\nDettaglio: {Describe(ex)}";
             EmptyText = "";
         }
         finally
         {
             if (ReferenceEquals(_refreshCts, cts)) IsRefreshing = false;
         }
+    }
+
+    /// <summary>Messaggio diagnostico breve: tipo + messaggio, risalendo alle inner exception.</summary>
+    internal static string Describe(Exception ex)
+    {
+        var parts = new List<string>();
+        for (var e = ex; e is not null && parts.Count < 3; e = e.InnerException)
+            parts.Add($"{e.GetType().Name}: {e.Message}");
+        return string.Join(" → ", parts);
     }
 
     [RelayCommand]

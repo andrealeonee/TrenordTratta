@@ -35,7 +35,8 @@ public sealed class RouteService(IViaggiaTrenoClient viaggiaTreno, IRouteReposit
         var found = await viaggiaTreno.SearchStationsAsync(name, ct).ConfigureAwait(false);
         var match = PickBest(found, name)
             ?? throw new InvalidOperationException(
-                $"Stazione \"{name}\" non trovata su ViaggiaTreno. Modifica la tratta e selezionala dall'elenco.");
+                $"Stazione \"{name}\" non trovata su ViaggiaTreno ({found.Count} risultati). "
+                + "Le stazioni Ferrovienord potrebbero non essere coperte: prova a cercarla in Impostazioni → Tratte.");
         return match.Code;
     }
 

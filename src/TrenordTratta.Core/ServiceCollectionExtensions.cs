@@ -36,7 +36,10 @@ public static class ServiceCollectionExtensions
         client.BaseAddress = new Uri(baseAddress);
         // Il timeout lo gestisce la pipeline Polly (per tentativo e totale).
         client.Timeout = Timeout.InfiniteTimeSpan;
+        // Accept generico: con solo application/json RESTEasy risponde 406 agli endpoint text/plain
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
+        // Alcuni endpoint rifiutano richieste senza User-Agent
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Linux; Android 14) MioTreno/1.0");
     }
 
     /// <summary>

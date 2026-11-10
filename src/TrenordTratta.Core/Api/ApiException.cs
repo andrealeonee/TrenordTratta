@@ -19,6 +19,9 @@ internal static class ApiResponse
     {
         var body = await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
 
+        // 204 / body vuoto = "nessun risultato", non un errore (es. stazione non trovata)
+        if (response.StatusCode == HttpStatusCode.NoContent) return "";
+
         if (response.StatusCode != HttpStatusCode.OK)
             throw new ApiException(source, $"HTTP {(int)response.StatusCode}", response.StatusCode);
 
