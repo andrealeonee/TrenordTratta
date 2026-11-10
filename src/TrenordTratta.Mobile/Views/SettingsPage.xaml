@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TrenordTratta.Mobile.ViewModels"
+             xmlns:models="clr-namespace:TrenordTratta.Core.Models;assembly=TrenordTratta.Core"
+             x:Class="TrenordTratta.Mobile.Views.SettingsPage"
+             x:DataType="vm:SettingsViewModel"
+             Title="Impostazioni">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="0,0,0,24">
+
+            <!-- Affollamento -->
+            <Label Text="AFFOLLAMENTO" Style="{StaticResource SectionTitle}" />
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout>
+                            <Label Text="Mostra affollamento" FontAttributes="Bold" />
+                            <Label Text="Pallino accanto all'orario" Style="{StaticResource Muted}" />
+                        </VerticalStackLayout>
+                        <Switch Grid.Column="1" IsToggled="{Binding ShowCrowding}" OnColor="{StaticResource Primary}" />
+                    </Grid>
+
+                    <HorizontalStackLayout Spacing="14" IsVisible="{Binding ShowCrowding}">
+                        <HorizontalStackLayout Spacing="4">
+                            <BoxView Color="#1E8E3E" WidthRequest="10" HeightRequest="10" CornerRadius="5" VerticalOptions="Center" />
+                            <Label Text="&lt; 40%" Style="{StaticResource Muted}" />
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Spacing="4">
+                            <BoxView Color="#F2A600" WidthRequest="10" HeightRequest="10" CornerRadius="5" VerticalOptions="Center" />
+                            <Label Text="40–70%" Style="{StaticResource Muted}" />
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Spacing="4">
+                            <BoxView Color="#D93025" WidthRequest="10" HeightRequest="10" CornerRadius="5" VerticalOptions="Center" />
+                            <Label Text="&gt; 70%" Style="{StaticResource Muted}" />
+                        </HorizontalStackLayout>
+                    </HorizontalStackLayout>
+
+                    <VerticalStackLayout IsVisible="{Binding ShowCrowding}" Spacing="2">
+                        <Label Text="Fonti affidabili" FontAttributes="Bold" />
+                        <Entry Text="{Binding TrustedSources}" Placeholder="Tutte (separa con virgole)" />
+                        <Label Text="Se vuoto, si usa qualsiasi fonte dichiarata. Il nome della fonte è visibile nel dettaglio treno."
+                               Style="{StaticResource Muted}" FontSize="11" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Ritardo -->
+            <Label Text="RITARDO" Style="{StaticResource SectionTitle}" />
+            <Border Style="{StaticResource Card}">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Text="{Binding DelayThresholdText}" VerticalOptions="Center" />
+                    <Stepper Grid.Column="1" Minimum="0" Maximum="10" Increment="1" Value="{Binding DelayThreshold}" />
+                </Grid>
+            </Border>
+
+            <!-- Aggiornamento e direzione -->
+            <Label Text="AGGIORNAMENTO" Style="{StaticResource SectionTitle}" />
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Aggiornamento automatico" VerticalOptions="Center" />
+                        <Picker Grid.Column="1" ItemsSource="{Binding RefreshLabels}" SelectedIndex="{Binding RefreshIndex}"
+                                WidthRequest="130" />
+                    </Grid>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="{Binding SwitchHourText}" VerticalOptions="Center" />
+                        <Stepper Grid.Column="1" Minimum="9" Maximum="18" Increment="1" Value="{Binding SwitchHour}" />
+                    </Grid>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="{Binding LookAheadText}" VerticalOptions="Center" />
+                        <Stepper Grid.Column="1" Minimum="60" Maximum="180" Increment="60" Value="{Binding LookAheadMinutes}" />
+                    </Grid>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="{Binding MaxTrainsText}" VerticalOptions="Center" />
+                        <Stepper Grid.Column="1" Minimum="3" Maximum="20" Increment="1" Value="{Binding MaxTrains}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Tratte -->
+            <Label Text="TRATTE" Style="{StaticResource SectionTitle}" />
+            <VerticalStackLayout BindableLayout.ItemsSource="{Binding Routes}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="models:RouteDefinition">
+                        <Border Style="{StaticResource Card}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding EditRouteCommand, Source={RelativeSource AncestorType={x:Type vm:SettingsViewModel}}, x:DataType=vm:SettingsViewModel}"
+                                                      CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout>
+                                <Label Text="{Binding Name}" FontAttributes="Bold" />
+                                <Label Style="{StaticResource Muted}">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding StationAName}" />
+                                            <Span Text=" ↔ " />
+                                            <Span Text="{Binding StationBName}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+            <Button Text="+ Aggiungi tratta" Style="{StaticResource SecondaryButton}" Margin="12,8"
+                    Command="{Binding AddRouteCommand}" />
+
+            <Label Text="Dati: Trenord e ViaggiaTreno (API non ufficiali). ViaggiaTreno usa HTTP non cifrato."
+                   Style="{StaticResource Muted}" FontSize="11" Margin="16,16" HorizontalTextAlignment="Center" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

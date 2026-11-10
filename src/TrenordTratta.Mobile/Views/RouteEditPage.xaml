@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TrenordTratta.Mobile.ViewModels"
+             xmlns:vt="clr-namespace:TrenordTratta.Core.Api.ViaggiaTreno;assembly=TrenordTratta.Core"
+             x:Class="TrenordTratta.Mobile.Views.RouteEditPage"
+             x:DataType="vm:RouteEditViewModel"
+             Title="{Binding PageTitle}">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <VerticalStackLayout Padding="16,12" Spacing="10">
+            <Label Text="Nome (facoltativo)" Style="{StaticResource Muted}" />
+            <Entry Text="{Binding Name}" Placeholder="Es. Casa ↔ Lavoro" />
+
+            <Label Text="Stazione A (andata: A → B)" Style="{StaticResource Muted}" />
+            <Grid ColumnDefinitions="*,Auto">
+                <Entry Text="{Binding StationAText}" Placeholder="Cerca stazione…" />
+                <Label Grid.Column="1" Text="{Binding StationACode}" Style="{StaticResource Muted}" FontSize="11" VerticalOptions="Center" />
+            </Grid>
+
+            <Label Text="Stazione B" Style="{StaticResource Muted}" />
+            <Grid ColumnDefinitions="*,Auto">
+                <Entry Text="{Binding StationBText}" Placeholder="Cerca stazione…" />
+                <Label Grid.Column="1" Text="{Binding StationBCode}" Style="{StaticResource Muted}" FontSize="11" VerticalOptions="Center" />
+            </Grid>
+
+            <ActivityIndicator IsRunning="{Binding IsSearching}" IsVisible="{Binding IsSearching}" Color="{StaticResource Primary}" />
+
+            <Label Text="{Binding ErrorMessage}" TextColor="{StaticResource ErrorText}">
+                <Label.Triggers>
+                    <DataTrigger TargetType="Label" Binding="{Binding ErrorMessage}" Value="">
+                        <Setter Property="IsVisible" Value="False" />
+                    </DataTrigger>
+                </Label.Triggers>
+            </Label>
+        </VerticalStackLayout>
+
+        <!-- Risultati ricerca: tocca per scegliere -->
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Results}" SelectionMode="None" IsVisible="{Binding HasResults}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vt:VtStation">
+                    <Grid Padding="16,12" ColumnDefinitions="*,Auto">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding PickCommand, Source={RelativeSource AncestorType={x:Type vm:RouteEditViewModel}}, x:DataType=vm:RouteEditViewModel}"
+                                                  CommandParameter="{Binding .}" />
+                        </Grid.GestureRecognizers>
+                        <Label Text="{Binding Name}" />
+                        <Label Grid.Column="1" Text="{Binding Code}" Style="{StaticResource Muted}" FontSize="11" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Padding="12" ColumnSpacing="10">
+            <Button Text="Salva" Command="{Binding SaveCommand}" />
+            <Button Grid.Column="1" Text="Elimina" Style="{StaticResource SecondaryButton}"
+                    TextColor="#D93025" BorderColor="#D93025"
+                    IsVisible="{Binding CanDelete}" Command="{Binding DeleteCommand}" />
+        </Grid>
+    </Grid>
+</ContentPage>

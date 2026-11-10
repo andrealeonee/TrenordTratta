@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ViaggiaTreno espone le API solo in HTTP. Consentiamo il traffico in chiaro SOLO verso quel dominio;
+  tutto il resto (Trenord compreso) resta obbligatoriamente HTTPS.
+  Rischio: su reti non fidate le risposte di ViaggiaTreno possono essere lette o alterate.
+  Non vengono inviati dati personali, quindi per uso personale è accettabile.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">www.viaggiatreno.it</domain>
+    </domain-config>
+</network-security-config>

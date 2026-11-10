@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:views="clr-namespace:TrenordTratta.Mobile.Views"
+       x:Class="TrenordTratta.Mobile.AppShell"
+       Shell.FlyoutBehavior="Disabled">
+
+    <TabBar>
+        <ShellContent Title="Partenze"
+                      Icon="tab_train.png"
+                      Route="departures"
+                      ContentTemplate="{DataTemplate views:DeparturesPage}" />
+        <ShellContent Title="Storico"
+                      Icon="tab_history.png"
+                      Route="history"
+                      ContentTemplate="{DataTemplate views:HistoryPage}" />
+        <ShellContent Title="Impostazioni"
+                      Icon="tab_settings.png"
+                      Route="settings"
+                      ContentTemplate="{DataTemplate views:SettingsPage}" />
+    </TabBar>
+
+</Shell>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TrenordTratta.Mobile.ViewModels"
+             x:Class="TrenordTratta.Mobile.Views.HistoryPage"
+             x:DataType="vm:HistoryViewModel"
+             Title="Storico">
+
+    <Grid RowDefinitions="Auto,*">
+        <Label Text="{Binding Summary}" Style="{StaticResource Muted}" Padding="16,12,16,4" />
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Groups}" IsGrouped="True" SelectionMode="None">
+
+            <CollectionView.EmptyView>
+                <Label Text="Nessun viaggio salvato.&#10;Dalla lista partenze scorri a destra su un treno per segnarlo come preso."
+                       Style="{StaticResource Muted}" HorizontalTextAlignment="Center" Margin="24,48" />
+            </CollectionView.EmptyView>
+
+            <CollectionView.GroupHeaderTemplate>
+                <DataTemplate x:DataType="vm:TripGroup">
+                    <Label Text="{Binding Title}" Style="{StaticResource SectionTitle}" />
+                </DataTemplate>
+            </CollectionView.GroupHeaderTemplate>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:TripItemViewModel">
+                    <SwipeView>
+                        <SwipeView.RightItems>
+                            <SwipeItems>
+                                <SwipeItem Text="Elimina" BackgroundColor="#D93025" Command="{Binding DeleteCommand}" />
+                            </SwipeItems>
+                        </SwipeView.RightItems>
+
+                        <Border Style="{StaticResource Card}">
+                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="2">
+                                <Label Text="{Binding TimeText}" FontAttributes="Bold" FontSize="16" />
+                                <Label Grid.Row="1" Style="{StaticResource Muted}">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding TrainText}" />
+                                            <Span Text=" · " />
+                                            <Span Text="{Binding LegText}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+
+                                <Label Grid.Column="1" Text="{Binding DelayText}" TextColor="{Binding DelayColor}"
+                                       FontAttributes="Bold" HorizontalTextAlignment="End" />
+                                <HorizontalStackLayout Grid.Column="1" Grid.Row="1" Spacing="4" HorizontalOptions="End"
+                                                       IsVisible="{Binding HasCrowding}">
+                                    <BoxView Color="{Binding CrowdingColor}" WidthRequest="8" HeightRequest="8"
+                                             CornerRadius="4" VerticalOptions="Center" />
+                                    <Label Text="{Binding CrowdingText}" Style="{StaticResource Muted}" FontSize="12" />
+                                </HorizontalStackLayout>
+                            </Grid>
+                        </Border>
+                    </SwipeView>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

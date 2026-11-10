@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:AutoRefreshPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:TrenordTratta.Mobile.Views"
+             xmlns:vm="clr-namespace:TrenordTratta.Mobile.ViewModels"
+             xmlns:models="clr-namespace:TrenordTratta.Core.Models;assembly=TrenordTratta.Core"
+             x:Class="TrenordTratta.Mobile.Views.DeparturesPage"
+             x:DataType="vm:DeparturesViewModel"
+             Shell.NavBarIsVisible="False"
+             Title="Partenze">
+
+    <Grid RowDefinitions="Auto,Auto,*">
+
+        <!-- Testata: tratta, direzione, inversione -->
+        <Grid Grid.Row="0" BackgroundColor="{StaticResource Primary}" Padding="16,14,12,14"
+              ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="8">
+
+            <Picker Grid.ColumnSpan="2"
+                    IsVisible="{Binding HasMultipleRoutes}"
+                    ItemsSource="{Binding Routes}"
+                    ItemDisplayBinding="{Binding Name, x:DataType=models:RouteDefinition}"
+                    SelectedItem="{Binding SelectedRoute}"
+                    TextColor="{StaticResource OnPrimary}"
+                    TitleColor="{StaticResource OnPrimaryMuted}"
+                    Title="Tratta" />
+
+            <Label Grid.Row="1" Text="{Binding LegLabel}" FontSize="20" FontAttributes="Bold"
+                   TextColor="{StaticResource OnPrimary}" LineBreakMode="TailTruncation" />
+            <Label Grid.Row="2" Text="{Binding Subtitle}" FontSize="12" TextColor="{StaticResource OnPrimaryMuted}" />
+
+            <Button Grid.Row="1" Grid.RowSpan="2" Grid.Column="1"
+                    Text="⇅" FontSize="22" WidthRequest="48" HeightRequest="48" Padding="0"
+                    CornerRadius="24" BackgroundColor="{StaticResource PrimaryDark}"
+                    Command="{Binding ToggleDirectionCommand}"
+                    SemanticProperties.Description="Inverti direzione" />
+        </Grid>
+
+        <!-- Errori e avvisi -->
+        <VerticalStackLayout Grid.Row="1">
+            <Label Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Padding="16,10"
+                   BackgroundColor="{StaticResource ErrorBg}" TextColor="{StaticResource ErrorText}" />
+            <Label Text="{Binding WarningText}" IsVisible="{Binding HasWarning}" Padding="16,8" FontSize="12"
+                   BackgroundColor="{StaticResource WarningBg}" TextColor="{StaticResource WarningText}" />
+        </VerticalStackLayout>
+
+        <RefreshView Grid.Row="2" IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}"
+                     RefreshColor="{StaticResource Primary}">
+            <CollectionView ItemsSource="{Binding Items}" SelectionMode="None">
+
+                <CollectionView.Header>
+                    <BoxView HeightRequest="6" Color="Transparent" />
+                </CollectionView.Header>
+
+                <CollectionView.EmptyView>
+                    <Label Text="{Binding EmptyText}" Style="{StaticResource Muted}"
+                           HorizontalTextAlignment="Center" Margin="24,48" />
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:DepartureItemViewModel">
+                        <SwipeView BackgroundColor="Transparent">
+                            <SwipeView.LeftItems>
+                                <SwipeItems Mode="Execute">
+                                    <SwipeItem Text="{Binding TakenSwipeText}" BackgroundColor="{StaticResource Primary}"
+                                               Command="{Binding ToggleTakenCommand}" />
+                                </SwipeItems>
+                            </SwipeView.LeftItems>
+
+                            <Border Style="{StaticResource Card}">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OpenCommand}" />
+                                </Border.GestureRecognizers>
+
+                                <Grid ColumnDefinitions="76,*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="2">
+
+                                    <!-- Orario + pallino affollamento -->
+                                    <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                        <Label Text="{Binding TimeText}" FontSize="22" FontAttributes="Bold" />
+                                        <BoxView IsVisible="{Binding ShowCrowding}" Color="{Binding CrowdingColor}"
+                                                 WidthRequest="10" HeightRequest="10" CornerRadius="5"
+                                                 VerticalOptions="Center"
+                                                 SemanticProperties.Description="{Binding CrowdingText}" />
+                                    </HorizontalStackLayout>
+
+                                    <!-- Ritardo: verde/rosso -->
+                                    <HorizontalStackLayout Grid.Row="1" Spacing="4">
+                                        <Label Text="{Binding DelayText}" TextColor="{Binding DelayColor}"
+                                               FontAttributes="Bold" FontSize="13" />
+                                        <Label Text="{Binding ExpectedText}" IsVisible="{Binding HasExpected}"
+                                               TextColor="{Binding DelayColor}" FontSize="13" />
+                                    </HorizontalStackLayout>
+
+                                    <Label Grid.Column="1" Text="{Binding TrainText}" FontAttributes="Bold"
+                                           VerticalOptions="Center" LineBreakMode="TailTruncation" />
+                                    <Label Grid.Column="1" Grid.Row="1" Style="{StaticResource Muted}"
+                                           LineBreakMode="TailTruncation">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="{Binding ArrivalText}" />
+                                                <Span Text="  " />
+                                                <Span Text="{Binding TerminusText}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+
+                                    <Label Grid.Column="2" Text="{Binding PlatformText}" FontAttributes="Bold"
+                                           HorizontalTextAlignment="End" VerticalOptions="Center" />
+                                    <Label Grid.Column="2" Grid.Row="1" Text="✓ preso" IsVisible="{Binding IsTaken}"
+                                           TextColor="{StaticResource Primary}" FontSize="12" FontAttributes="Bold"
+                                           HorizontalTextAlignment="End" />
+                                </Grid>
+                            </Border>
+                        </SwipeView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+                <CollectionView.Footer>
+                    <Label Text="Scorri a destra su un treno per segnarlo come preso"
+                           Style="{StaticResource Muted}" FontSize="11"
+                           HorizontalTextAlignment="Center" Margin="16,8,16,24" />
+                </CollectionView.Footer>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</views:AutoRefreshPage>
