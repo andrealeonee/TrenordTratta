@@ -52,3 +52,4 @@ Resilienza (Polly via `Microsoft.Extensions.Http.Resilience`): timeout totale 30
 - ViaggiaTreno è solo HTTP: `network_security_config.xml` consente il cleartext **solo** per `www.viaggiatreno.it`; tutto il resto resta HTTPS. Non vengono inviati dati personali.
 - Le due API non sono ufficiali e possono cambiare senza preavviso: il parsing è tollerante (numeri come stringhe, booleani come "true"/"1") e i fallimenti per singolo treno non bloccano la lista.
 - Nessun segreto nel codice; il DB SQLite resta nella sandbox dell'app.
+ 
