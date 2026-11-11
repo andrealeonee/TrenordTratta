@@ -23,12 +23,34 @@ jobs:
       - name: Test Core
         run: dotnet test tests/TrenordTratta.Core.Tests -c Release
 
+      # Keystore fisso dai secrets: stessa firma a ogni build, così l'app si aggiorna senza disinstallare.
+      # Se i secrets mancano si usa la chiave di debug del runner (diversa a ogni build).
+      - name: Keystore
+        id: ks
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/miotreno.keystore"
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::Secret KEYSTORE_BASE64 assente: APK firmato con chiave di debug"
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Publish APK
-        run: >
-          dotnet publish src/TrenordTratta.Mobile/TrenordTratta.Mobile.csproj
-          -f net10.0-android -c Release
-          -p:AndroidPackageFormat=apk
-          -o out
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          SIGN=""
+          if [ "${{ steps.ks.outputs.signed }}" = "true" ]; then
+            SIGN="-p:AndroidKeyStore=true -p:AndroidSigningKeyStore=$RUNNER_TEMP/miotreno.keystore -p:AndroidSigningKeyAlias=miotreno -p:AndroidSigningStorePass=env:KEYSTORE_PASSWORD -p:AndroidSigningKeyPass=env:KEYSTORE_PASSWORD"
+          fi
+          dotnet publish src/TrenordTratta.Mobile/TrenordTratta.Mobile.csproj \
+            -f net10.0-android -c Release \
+            -p:AndroidPackageFormat=apk \
+            -p:ApplicationVersion=${{ github.run_number }} \
+            $SIGN -o out
 
       - uses: actions/upload-artifact@v4
         with:
