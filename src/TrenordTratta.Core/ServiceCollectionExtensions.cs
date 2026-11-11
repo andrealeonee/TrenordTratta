@@ -36,7 +36,7 @@ public static class ServiceCollectionExtensions
         client.BaseAddress = new Uri(baseAddress);
         // Il timeout lo gestisce la pipeline Polly (per tentativo e totale).
         client.Timeout = Timeout.InfiniteTimeSpan;
-        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
     }
 
     /// <summary>
